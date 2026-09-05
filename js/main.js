@@ -59,7 +59,6 @@ function agregarProductoNuevo(nombre, categoria, precio, cantidad) {
   console.log(`Se agregó "${nombre}" al stock.`);
 }
 
-// Búsqueda 2: filter -> productos con lógica de negocio real (stock bajo)
 function productosConStockBajo(limite = 5) {
   return stock.filter((item) => item.cantidad > 0 && item.cantidad < limite);
 }
