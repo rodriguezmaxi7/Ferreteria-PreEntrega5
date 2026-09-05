@@ -32,6 +32,7 @@ for (const item of stock) {
   console.log(`${item.nombre}: ${item.cantidad} unidades`);
 }
 
+
 function buscarProducto(nombre) {
   return stock.find((item) => item.nombre === nombre);
 }
@@ -99,16 +100,27 @@ while (producto !== "salir") {
     break;
   }
 
+  if (producto === "agregar") {
+    const nombreNuevo = prompt("Ingrese el nombre del nuevo producto:");
+    const categoriaNueva = prompt("Ingrese la categoría del nuevo producto:");
+    const precioNuevo = parseFloat(prompt("Ingrese el precio del nuevo producto:"));
+    const cantidadNueva = parseInt(prompt("Ingrese la cantidad del nuevo producto:"));
+    agregarProductoNuevo(nombreNuevo, categoriaNueva, precioNuevo, cantidadNueva);
+    continue;
+  }
+
   if (comprarProducto(producto)) {
     console.log(
       `¡Compra exitosa! Quedan ${buscarProducto(producto).cantidad} unidades de ${producto}.`,
     );
   } else if (nombresProductos.includes(producto)) {
+    eliminarProductoAgotado(producto);
     mostrarError(`Lo sentimos, no hay stock disponible para ${producto}.`);
   } else {
     mostrarError("Producto no válido. Por favor, ingrese un producto válido.");
-  }
+  } 
 }
+
 
 console.log("--- Stock final ---");
 for (const item of stock) {
