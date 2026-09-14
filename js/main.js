@@ -27,12 +27,6 @@ function obtenerNombresProductos() {
   return stock.map((item) => item.nombre);
 }
 
-console.log("--- Stock disponible al inicio ---");
-for (const item of stock) {
-  console.log(`${item.nombre}: ${item.cantidad} unidades`);
-}
-
-
 function buscarProducto(nombre) {
   return stock.find((item) => item.nombre === nombre);
 }
@@ -82,51 +76,83 @@ function gananciaTotalEsperada() {
   return stock.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
 }
 
-const mostrarError = (mensaje) => {
-  console.error(mensaje);
-};
+function mostrarMensaje(mensaje, tipo = "exito") {
+  const feedback = document.getElementById("feedback");
+  feedback.textContent = mensaje;
+  feedback.className = tipo;
+  setTimeout(() => {
+    feedback.textContent = "";
+    feedback.className = "";
+  }, 2500);
+  }
 
-let producto = "";
-while (producto !== "salir") {
-  const nombresProductos = obtenerNombresProductos();
-  producto = prompt(
-    `Ingrese el nombre del producto que desea comprar (${nombresProductos.join(", ")}) o escriba 'salir' para finalizar:`,
+function mostrarError(mensaje) {
+  mostrarMensaje(mensaje, "error");
+}
+
+
+function renderizarProductos(lista = stock) {
+  const contenedorItems = document.getElementById("contenedor-items");
+  const productosHTML = lista.map(
+    (item) => `
+      <div class="producto-card">
+        <h3>${item.nombre}</h3>
+        <p class="precio-stock">$${item.precio} — ${item.cantidad} en stock</p>
+        <button class="btn-eliminar" data-nombre="${item.nombre}">Eliminar</button>
+      </div>
+    `
   );
-
-  if (producto === "salir") {
-    console.log("Gracias por su compra. ¡Hasta luego!");
-    alert("Gracias por su compra. ¡Hasta luego!");
-    break;
-  }
-
-  if (producto === "agregar") {
-    const nombreNuevo = prompt("Ingrese el nombre del nuevo producto:");
-    const categoriaNueva = prompt("Ingrese la categoría del nuevo producto:");
-    const precioNuevo = parseFloat(prompt("Ingrese el precio del nuevo producto:"));
-    const cantidadNueva = parseInt(prompt("Ingrese la cantidad del nuevo producto:"));
-    agregarProductoNuevo(nombreNuevo, categoriaNueva, precioNuevo, cantidadNueva);
-    continue;
-  }
-
-  if (comprarProducto(producto)) {
-    console.log(
-      `¡Compra exitosa! Quedan ${buscarProducto(producto).cantidad} unidades de ${producto}.`,
-    );
-  } else if (nombresProductos.includes(producto)) {
-    eliminarProductoAgotado(producto);
-    mostrarError(`Lo sentimos, no hay stock disponible para ${producto}.`);
-  } else {
-    mostrarError("Producto no válido. Por favor, ingrese un producto válido.");
-  } 
+  contenedorItems.innerHTML = productosHTML.join("");
 }
+const inputBuscar = document.getElementById("input-buscar");
+const contenedorItems = document.getElementById("contenedor-items");
 
+const btnAgregar = document.getElementById("btn-agregar");
 
-console.log("--- Stock final ---");
-for (const item of stock) {
-  console.log(`${item.nombre}: ${item.cantidad} unidades`);
-}
+btnAgregar.addEventListener("click", () => {
+  const inputNombre = document.getElementById("input-nombre");
+  const inputPrecio = document.getElementById("input-precio");
 
-console.log("--- Productos con stock bajo (menos de 5) ---");
-console.log(productosConStockBajo());
+  const nombreProducto = inputNombre.value;
+  const precioProducto = inputPrecio.value;
+  const precioNumerico = parseFloat(precioProducto);
 
-console.log(`--- Ganancia total esperada: $${gananciaTotalEsperada()} ---`);
+  console.log("Producto:", nombreProducto);
+  console.log("Precio:", precioProducto);
+  console.log("Precio numérico:", precioNumerico);
+
+  if (nombreProducto === "" || isNaN(precioNumerico) || precioNumerico <= 0) {
+    mostrarError("Por favor, ingrese un nombre válido y un precio mayor a 0.");
+    return;
+  }
+  
+  const nuevoProducto = new Producto(nombreProducto, "Herramientas", precioNumerico,  0);
+  stock.push(nuevoProducto);
+  console.log(`Se agregó "${nombreProducto}" al stock con precio ${precioNumerico}.`);
+  
+  inputNombre.value = "";
+  inputPrecio.value = "";
+
+  renderizarProductos();
+  });
+
+  contenedorItems.addEventListener("click", (evento) => {
+  if (evento.target.classList.contains("btn-eliminar")) {
+    const nombre = evento.target.dataset.nombre;
+    stock = stock.filter((item) => item.nombre !== nombre);
+    mostrarMensaje(`"${nombre}" eliminado.`);
+    renderizarProductos();
+  }
+});
+
+inputBuscar.addEventListener("keyup", () => {
+  const texto = inputBuscar.value.toLowerCase();
+  const filtrados = stock.filter((item) =>
+    item.nombre.toLowerCase().includes(texto)
+  );
+  renderizarProductos(filtrados);
+});
+
+renderizarProductos();
+
+  

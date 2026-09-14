@@ -4,11 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ferretería</title>
-    <script defer src="js/main.js"></script>
+    <link rel="stylesheet" href="css/styles.css">
+    <script defer src="js/main.js"></script>  
 </head>
 <body>
-    <h1>Ferretería</h1>
-    <p>Bienvenido a nuestra ferretería.</p>
+   <main class="wrapper">
+        <h1 class="title-princ">Bienvenido a la Ferretería</h1>
+        <p>Encuentra todo lo que necesitas para tus proyectos de construcción y reparación.</p>
+       
+
+        <section class="agregar-section">
+            <input type="text" id="input-nombre" placeholder="Nombre del producto...">
+            
+
+            <div class="input-precio-contenedor">
+                <span class="moneda">$</span>
+                <input type="number" id="input-precio" placeholder="Precio..." min="0" step="0.01">
+
+            </div>
+            <button type="button" id="btn-agregar">Agregar</button>
+        </section>
+
+        <section class="search-section">
+            <input type="text" id="input-buscar" placeholder="Buscar productos...">
+
+        </section>
+
+        <h2 class="title-sec">Catalogo disponible</h2>
+        <div id="contenedor-items" class="contenedor-items">
+            
+        </div>
+   </main>
 
 </body>
 </html>
