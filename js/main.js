@@ -96,6 +96,7 @@ function renderizarProductos(lista = stock) {
   const productosHTML = lista.map(
     (item) => `
       <div class="producto-card">
+      <img src="img/ferreti2.jpg" alt="${item.nombre}" class="imagen-producto">
         <h3>${item.nombre}</h3>
         <p class="precio-stock">$${item.precio} — ${item.cantidad} en stock</p>
         <button class="btn-eliminar" data-nombre="${item.nombre}">Eliminar</button>
@@ -117,9 +118,6 @@ btnAgregar.addEventListener("click", () => {
   const precioProducto = inputPrecio.value;
   const precioNumerico = parseFloat(precioProducto);
 
-  console.log("Producto:", nombreProducto);
-  console.log("Precio:", precioProducto);
-  console.log("Precio numérico:", precioNumerico);
 
   if (nombreProducto === "" || isNaN(precioNumerico) || precioNumerico <= 0) {
     mostrarError("Por favor, ingrese un nombre válido y un precio mayor a 0.");
@@ -128,7 +126,7 @@ btnAgregar.addEventListener("click", () => {
   
   const nuevoProducto = new Producto(nombreProducto, "Herramientas", precioNumerico,  0);
   stock.push(nuevoProducto);
-  console.log(`Se agregó "${nombreProducto}" al stock con precio ${precioNumerico}.`);
+  
   
   inputNombre.value = "";
   inputPrecio.value = "";
