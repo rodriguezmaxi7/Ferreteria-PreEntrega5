@@ -5,13 +5,6 @@ class Producto {
     this.precio = precio;
     this.cantidad = cantidad;
   }
-  vender(cantidadVendida) {
-    if (cantidadVendida > this.cantidad) {
-      console.log("No hay stock disponible");
-    } else {
-      this.cantidad = this.cantidad - cantidadVendida;
-    }
-  }
 }
 
 let stock = [
@@ -23,59 +16,6 @@ let stock = [
   new Producto("martillo", "Herramientas", 20000, 3),
 ];
 
-function obtenerNombresProductos() {
-  return stock.map((item) => item.nombre);
-}
-
-function buscarProducto(nombre) {
-  return stock.find((item) => item.nombre === nombre);
-}
-
-function hayStockDisponible(producto) {
-  const item = buscarProducto(producto);
-  if (item === undefined) {
-    return false;
-  }
-  return item.cantidad > 0;
-}
-
-function comprarProducto(producto) {
-  if (hayStockDisponible(producto)) {
-    const item = buscarProducto(producto);
-    item.vender(1);
-    return true;
-  }
-  return false;
-}
-
-function agregarProductoNuevo(nombre, categoria, precio, cantidad) {
-  stock.push(new Producto(nombre, categoria, precio, cantidad));
-  console.log(`Se agregó "${nombre}" al stock.`);
-}
-
-function productosConStockBajo(limite = 5) {
-  return stock.filter((item) => item.cantidad > 0 && item.cantidad < limite);
-}
-
-function eliminarProductoAgotado(nombre) {
-  const producto = buscarProducto(nombre);
-  if (producto === undefined) {
-    console.log(`No se encontró "${nombre}" en el stock.`);
-    return false;
-  }
-  if (producto.cantidad > 0) {
-    console.log(`"${nombre}" todavía tiene stock, no se puede eliminar.`);
-    return false;
-  }
-  stock = stock.filter((item) => item.nombre !== nombre);
-  console.log(`Se eliminó "${nombre}" del stock por estar agotado.`);
-  return true;
-}
-
-function gananciaTotalEsperada() {
-  return stock.reduce((acc, item) => acc + item.precio * item.cantidad, 0);
-}
-
 function mostrarMensaje(mensaje, tipo = "exito") {
   const feedback = document.getElementById("feedback");
   feedback.textContent = mensaje;
@@ -84,19 +24,18 @@ function mostrarMensaje(mensaje, tipo = "exito") {
     feedback.textContent = "";
     feedback.className = "";
   }, 2500);
-  }
+}
 
 function mostrarError(mensaje) {
   mostrarMensaje(mensaje, "error");
 }
-
 
 function renderizarProductos(lista = stock) {
   const contenedorItems = document.getElementById("contenedor-items");
   const productosHTML = lista.map(
     (item) => `
       <div class="producto-card">
-      <img src="img/ferreti2.jpg" alt="${item.nombre}" class="imagen-producto">
+        <img src="img/ferreti2.jpg" alt="${item.nombre}" class="imagen-producto">
         <h3>${item.nombre}</h3>
         <p class="precio-stock">$${item.precio} — ${item.cantidad} en stock</p>
         <button class="btn-eliminar" data-nombre="${item.nombre}">Eliminar</button>
@@ -105,9 +44,9 @@ function renderizarProductos(lista = stock) {
   );
   contenedorItems.innerHTML = productosHTML.join("");
 }
+
 const inputBuscar = document.getElementById("input-buscar");
 const contenedorItems = document.getElementById("contenedor-items");
-
 const btnAgregar = document.getElementById("btn-agregar");
 
 btnAgregar.addEventListener("click", () => {
@@ -118,23 +57,21 @@ btnAgregar.addEventListener("click", () => {
   const precioProducto = inputPrecio.value;
   const precioNumerico = parseFloat(precioProducto);
 
-
   if (nombreProducto === "" || isNaN(precioNumerico) || precioNumerico <= 0) {
     mostrarError("Por favor, ingrese un nombre válido y un precio mayor a 0.");
     return;
   }
-  
-  const nuevoProducto = new Producto(nombreProducto, "Herramientas", precioNumerico,  0);
+
+  const nuevoProducto = new Producto(nombreProducto, "Herramientas", precioNumerico, 0);
   stock.push(nuevoProducto);
-  
-  
+
   inputNombre.value = "";
   inputPrecio.value = "";
 
   renderizarProductos();
-  });
+});
 
-  contenedorItems.addEventListener("click", (evento) => {
+contenedorItems.addEventListener("click", (evento) => {
   if (evento.target.classList.contains("btn-eliminar")) {
     const nombre = evento.target.dataset.nombre;
     stock = stock.filter((item) => item.nombre !== nombre);
