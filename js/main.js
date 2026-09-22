@@ -1,5 +1,6 @@
 class Producto {
-  constructor(nombre, categoria, precio, cantidad) {
+  constructor(id, nombre, categoria, precio, cantidad) {
+    this.id = id;
     this.nombre = nombre;
     this.categoria = categoria;
     this.precio = precio;
@@ -7,14 +8,23 @@ class Producto {
   }
 }
 
-let stock = [
-  new Producto("clavos", "Construcción y albañilería", 500, 10),
-  new Producto("taladro", "Herramientas", 10000, 5),
-  new Producto("tornillo", "Construcción y albañilería", 2.99, 0),
-  new Producto("pegamento", "Mantenimiento", 5000, 8),
-  new Producto("pintura", "Pinturería", 15000, 5),
-  new Producto("martillo", "Herramientas", 20000, 3),
+const stockInicial = [
+  new Producto(1, "clavos", "Construcción y albañilería", 500, 10),
+  new Producto(2, "taladro", "Herramientas", 10000, 5),
+  new Producto(3, "tornillo", "Construcción y albañilería", 2.99, 0),
+  new Producto(4, "pegamento", "Mantenimiento", 5000, 8),
+  new Producto(5, "pintura", "Pinturería", 15000, 5),
+  new Producto(6, "martillo", "Herramientas", 20000, 3),
 ];
+
+let stock = JSON.parse(localStorage.getItem("stockFerreteria")) ?? stockInicial;
+
+let proximoId =
+  stock.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
+
+function guardarStockEnLocalStorage() {
+  localStorage.setItem("stockFerreteria", JSON.stringify(stock));
+}
 
 function mostrarMensaje(mensaje, tipo = "exito") {
   const feedback = document.getElementById("feedback");
@@ -32,16 +42,20 @@ function mostrarError(mensaje) {
 
 function renderizarProductos(lista = stock) {
   const contenedorItems = document.getElementById("contenedor-items");
-  const productosHTML = lista.map(
-    (item) => `
+
+  const productosHTML = lista.map((item) => {
+    const { id, nombre, precio, cantidad } = item;
+
+    return `
       <div class="producto-card">
-        <img src="img/ferreti2.jpg" alt="${item.nombre}" class="imagen-producto">
-        <h3>${item.nombre}</h3>
-        <p class="precio-stock">$${item.precio} — ${item.cantidad} en stock</p>
-        <button class="btn-eliminar" data-nombre="${item.nombre}">Eliminar</button>
+        <img src="img/ferreti2.jpg" alt="${nombre}" class="imagen-producto">
+        <h3>${nombre}</h3>
+        <p class="precio-stock">$${precio} — ${cantidad} en stock</p>
+        <button class="btn-eliminar" data-id="${id}">Eliminar</button>
       </div>
-    `
-  );
+    `;
+  });
+
   contenedorItems.innerHTML = productosHTML.join("");
 }
 
@@ -52,42 +66,69 @@ const btnAgregar = document.getElementById("btn-agregar");
 btnAgregar.addEventListener("click", () => {
   const inputNombre = document.getElementById("input-nombre");
   const inputPrecio = document.getElementById("input-precio");
+  const inputCategoria = document.getElementById("input-categoria");
 
-  const nombreProducto = inputNombre.value;
-  const precioProducto = inputPrecio.value;
-  const precioNumerico = parseFloat(precioProducto);
+  const nombreProducto = inputNombre.value.trim();
+  const precioNumerico = parseFloat(inputPrecio.value);
+  const categoriaProducto = inputCategoria?.value ?? "";
 
-  if (nombreProducto === "" || isNaN(precioNumerico) || precioNumerico <= 0) {
-    mostrarError("Por favor, ingrese un nombre válido y un precio mayor a 0.");
-    return;
-  }
+  const esValido =
+    nombreProducto !== "" &&
+    !isNaN(precioNumerico) &&
+    precioNumerico > 0 &&
+    categoriaProducto !== "";
 
-  const nuevoProducto = new Producto(nombreProducto, "Herramientas", precioNumerico, 0);
+  esValido
+    ? agregarProducto(
+        categoriaProducto,
+        inputNombre,
+        inputPrecio,
+        inputCategoria,
+      )
+    : mostrarError(
+        "Por favor, ingrese un nombre válido, un precio mayor a 0 y una categoría.",
+      );
+});
+
+function agregarProducto(categoria, inputNombre, inputPrecio, inputCategoria) {
+  const nuevoProducto = new Producto(
+    proximoId++,
+    inputNombre.value.trim(),
+    categoria,
+    parseFloat(inputPrecio.value),
+    0,
+  );
   stock.push(nuevoProducto);
+
+  guardarStockEnLocalStorage();
+  renderizarProductos();
 
   inputNombre.value = "";
   inputPrecio.value = "";
-
-  renderizarProductos();
-});
+  inputCategoria.value = "";
+  mostrarMensaje("Producto agregado correctamente.");
+}
 
 contenedorItems.addEventListener("click", (evento) => {
   if (evento.target.classList.contains("btn-eliminar")) {
-    const nombre = evento.target.dataset.nombre;
-    stock = stock.filter((item) => item.nombre !== nombre);
-    mostrarMensaje(`"${nombre}" eliminado.`);
+    const id = parseInt(evento.target.dataset.id);
+
+    stock = stock.filter((item) => item.id !== id);
+    guardarStockEnLocalStorage();
+
+    mostrarMensaje(`Producto con ID ${id} eliminado.`);
     renderizarProductos();
   }
 });
 
 inputBuscar.addEventListener("keyup", () => {
-  const texto = inputBuscar.value.toLowerCase();
-  const filtrados = stock.filter((item) =>
-    item.nombre.toLowerCase().includes(texto)
-  );
+  const texto = inputBuscar.value.toLowerCase().trim();
+
+  const filtrados = texto
+    ? stock.filter((item) => item.nombre.toLowerCase().includes(texto))
+    : stock;
+
   renderizarProductos(filtrados);
 });
 
 renderizarProductos();
-
-  
