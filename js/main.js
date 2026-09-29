@@ -21,9 +21,21 @@ let stock = JSON.parse(localStorage.getItem("stockFerreteria")) ?? stockInicial;
 
 let proximoId =
   stock.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
-
 function guardarStockEnLocalStorage() {
-  localStorage.setItem("stockFerreteria", JSON.stringify(stock));
+  try {
+    localStorage.setItem("stockFerreteria", JSON.stringify(stock));
+    console.log("Stock guardado correctamente");
+  } catch (error) {
+    console.error("Error al guardar en localStorage:", error);
+
+    if (error.name === "QuotaExceededError") {
+      mostrarError("No se pudo guardar el stock: se ha superado la cuota de almacenamiento.");
+    } else {
+      mostrarError("Ocurrió un error al guardar el stock en localStorage.");
+    }
+  } finally {
+    console.log("Intento de guardar stock en localStorage finalizado.");
+  }
 }
 
 function mostrarMensaje(mensaje, tipo = "exito") {
@@ -132,3 +144,8 @@ inputBuscar.addEventListener("keyup", () => {
 });
 
 renderizarProductos();
+
+setTimeout(() => {
+  mostrarMensaje("Oferta especial: ¡10% de descuento en todos los productos por tiempo limitado!", "exito");
+}, 5000);
+
