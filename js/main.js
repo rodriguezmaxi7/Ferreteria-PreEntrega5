@@ -1,3 +1,25 @@
+const cargando = document.getElementById("cargando");
+
+async function obtenerProductos() {
+  cargando.hidden = false;
+
+  try {
+    const response = await fetch("./data.json");
+
+    if (!response.ok) {
+      throw new Error(`Error en la solicitud: ${response.status}`);
+    }
+
+    const productos = await response.json();
+    return productos;
+  } catch (error) {
+    console.error("Error al obtener productos:", error);
+    return [];
+  } finally {
+    cargando.hidden = true;
+  }
+}
+
 class Producto {
   constructor(id, nombre, categoria, precio, cantidad) {
     this.id = id;
@@ -21,6 +43,7 @@ let stock = JSON.parse(localStorage.getItem("stockFerreteria")) ?? stockInicial;
 
 let proximoId =
   stock.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
+
 function guardarStockEnLocalStorage() {
   try {
     localStorage.setItem("stockFerreteria", JSON.stringify(stock));
@@ -39,13 +62,26 @@ function guardarStockEnLocalStorage() {
 }
 
 function mostrarMensaje(mensaje, tipo = "exito") {
-  const feedback = document.getElementById("feedback");
-  feedback.textContent = mensaje;
-  feedback.className = tipo;
-  setTimeout(() => {
-    feedback.textContent = "";
-    feedback.className = "";
-  }, 2500);
+  if (tipo === "error") {
+    Swal.fire({
+      icon: "error",
+      title: "Atención",
+      text: mensaje,
+      confirmButtonColor: "#d33",
+      confirmButtonText: "Entendido"
+    });
+    return;
+  }
+
+  Toastify({
+    text: mensaje,
+    duration: 3000,
+    gravity: "top",
+    position: "right",
+    style: {
+      background: "linear-gradient(to right, #00b09b, #96c93d)",
+    }
+  }).showToast();
 }
 
 function mostrarError(mensaje) {
@@ -149,3 +185,25 @@ setTimeout(() => {
   mostrarMensaje("Oferta especial: ¡10% de descuento en todos los productos por tiempo limitado!", "exito");
 }, 5000);
 
+
+async function iniciar() {
+  const productosAPI = await obtenerProductos();
+  if (!localStorage.getItem("stockFerreteria") && productosAPI.length > 0) {
+    stock = productosAPI.map(
+      (p) => new Producto(p.id, p.nombre, p.categoria, p.categoria || "General", p.precio, p.stock ?? p.cantidad ?? 0)
+    );
+    guardarStockEnLocalStorage();
+  }
+
+  if (productosAPI.length > 0) {
+    mostrarMensaje("Productos cargados desde la API.", "exito");
+  } else {
+    mostrarMensaje("No se pudieron cargar productos desde la API. Se utilizará el stock local.", "error");
+  }
+ 
+ proximoId = stock.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
+
+ renderizarProductos();
+}
+
+iniciar();

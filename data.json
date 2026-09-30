@@ -1,0 +1,50 @@
+[
+    {
+        "id": 1,
+        "nombre": "Clavo",
+        "precio": 500,
+        "stock": 10,
+        "categoria": "Construcción y albañilería",
+        "imagen":  "img/ferreti2.jpg"
+    },
+    {
+        "id": 2,
+        "nombre": "Taladro",
+        "precio": 10000,
+        "stock": 5,
+        "categoria": "Herramientas",
+        "imagen":  "img/ferreti2.jpg"   
+    },
+    {
+        "id": 3,
+        "nombre": "Tornillo",
+        "precio": 300,
+        "stock": 0,
+        "categoria": "Construcción y albañilería",
+        "imagen":  "img/ferreti2.jpg"
+    },
+    {
+        "id": 4,
+        "nombre": "Pegamento",
+        "precio": 5000,
+        "stock": 8,
+        "categoria": "Mantenimiento",
+        "imagen":  "img/ferreti2.jpg"
+    },
+    {
+        "id": 5,
+        "nombre": "Pintura",
+        "precio": 15000,
+        "stock": 5,
+        "categoria": "Pinturería",
+        "imagen": "img/ferreti2.jpg"
+    },
+    {
+        "id": 6,
+        "nombre": "Martillo",
+        "precio": 20000,
+        "stock": 3,
+        "categoria": "Herramientas",
+        "imagen": "img/ferreti2.jpg"
+    }
+]

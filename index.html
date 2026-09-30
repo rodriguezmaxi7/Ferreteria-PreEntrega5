@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ferretería</title>
+    <title>Ferretería - PreEntrega 10</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
     <link rel="stylesheet" href="css/styles.css">
-    <script defer src="js/main.js"></script>  
+    
 </head>
 <body>
    <main class="wrapper">
@@ -41,10 +42,19 @@
         </section>
 
         <h2 class="title-sec">Catalogo disponible</h2>
+
+        <div id="cargando" class="estado-carga" hidden>
+            <div class="spinner"></div>
+            <p>Cargando productos...</p>
+        </div>
+
         <div id="contenedor-items" class="contenedor-items">
             
         </div>
    </main>
+   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script src="./js/main.js"></script>
 
 </body>
 </html>
