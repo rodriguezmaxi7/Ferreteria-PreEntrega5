@@ -68,23 +68,6 @@ p {
     color: #333;
 }
 
-.exito {
-    color: #027002;
-    font-weight: bold;
-    margin-top: 10px;
-    background-color: #60f343;
-    border: 1px solid #161616;
-    padding: 10px;
-}
-
-.error {
-    color: #380101;
-    font-weight: bold;
-    margin-top: 10px;
-    background-color: #eb0505;
-    border: 1px solid #161616;
-    padding: 10px;
-}
 
 .estado-carga {
     text-align: center;

@@ -30,24 +30,12 @@ class Producto {
   }
 }
 
-const stockInicial = [
-  new Producto(1, "clavos", "Construcción y albañilería", 500, 10),
-  new Producto(2, "taladro", "Herramientas", 10000, 5),
-  new Producto(3, "tornillo", "Construcción y albañilería", 2.99, 0),
-  new Producto(4, "pegamento", "Mantenimiento", 5000, 8),
-  new Producto(5, "pintura", "Pinturería", 15000, 5),
-  new Producto(6, "martillo", "Herramientas", 20000, 3),
-];
-
-let stock = JSON.parse(localStorage.getItem("stockFerreteria")) ?? stockInicial;
-
-let proximoId =
-  stock.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
+let stock = JSON.parse(localStorage.getItem("stockFerreteria")) ?? [];
+let proximoId = 1;
 
 function guardarStockEnLocalStorage() {
   try {
     localStorage.setItem("stockFerreteria", JSON.stringify(stock));
-    console.log("Stock guardado correctamente");
   } catch (error) {
     console.error("Error al guardar en localStorage:", error);
 
@@ -56,8 +44,6 @@ function guardarStockEnLocalStorage() {
     } else {
       mostrarError("Ocurrió un error al guardar el stock en localStorage.");
     }
-  } finally {
-    console.log("Intento de guardar stock en localStorage finalizado.");
   }
 }
 
@@ -68,7 +54,7 @@ function mostrarMensaje(mensaje, tipo = "exito") {
       title: "Atención",
       text: mensaje,
       confirmButtonColor: "#d33",
-      confirmButtonText: "Entendido"
+      confirmButtonText: "Entendido",
     });
     return;
   }
@@ -80,7 +66,7 @@ function mostrarMensaje(mensaje, tipo = "exito") {
     position: "right",
     style: {
       background: "linear-gradient(to right, #00b09b, #96c93d)",
-    }
+    },
   }).showToast();
 }
 
@@ -127,14 +113,9 @@ btnAgregar.addEventListener("click", () => {
     categoriaProducto !== "";
 
   esValido
-    ? agregarProducto(
-        categoriaProducto,
-        inputNombre,
-        inputPrecio,
-        inputCategoria,
-      )
+    ? agregarProducto(categoriaProducto, inputNombre, inputPrecio, inputCategoria)
     : mostrarError(
-        "Por favor, ingrese un nombre válido, un precio mayor a 0 y una categoría.",
+        "Por favor, ingrese un nombre válido, un precio mayor a 0 y una categoría."
       );
 });
 
@@ -144,7 +125,7 @@ function agregarProducto(categoria, inputNombre, inputPrecio, inputCategoria) {
     inputNombre.value.trim(),
     categoria,
     parseFloat(inputPrecio.value),
-    0,
+    0
   );
   stock.push(nuevoProducto);
 
@@ -179,31 +160,24 @@ inputBuscar.addEventListener("keyup", () => {
   renderizarProductos(filtrados);
 });
 
-renderizarProductos();
-
-setTimeout(() => {
-  mostrarMensaje("Oferta especial: ¡10% de descuento en todos los productos por tiempo limitado!", "exito");
-}, 5000);
-
-
 async function iniciar() {
+  const hayGuardado = localStorage.getItem("stockFerreteria") !== null;
   const productosAPI = await obtenerProductos();
-  if (!localStorage.getItem("stockFerreteria") && productosAPI.length > 0) {
+
+  if (productosAPI.length === 0) {
+    mostrarError("No se pudo cargar el catálogo desde data.json.");
+  } else if (!hayGuardado) {
     stock = productosAPI.map(
-      (p) => new Producto(p.id, p.nombre, p.categoria, p.categoria || "General", p.precio, p.stock ?? p.cantidad ?? 0)
+      (p) => new Producto(p.id, p.nombre, p.categoria, p.precio, p.stock)
     );
     guardarStockEnLocalStorage();
-  }
-
-  if (productosAPI.length > 0) {
-    mostrarMensaje("Productos cargados desde la API.", "exito");
+    mostrarMensaje("Productos cargados con éxito.");
   } else {
-    mostrarMensaje("No se pudieron cargar productos desde la API. Se utilizará el stock local.", "error");
+    mostrarMensaje("Catálogo cargado desde tu stock guardado.");
   }
- 
- proximoId = stock.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
 
- renderizarProductos();
+  proximoId = stock.reduce((max, item) => (item.id > max ? item.id : max), 0) + 1;
+  renderizarProductos();
 }
 
 iniciar();
